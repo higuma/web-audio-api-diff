@@ -1,0 +1,283 @@
+interface AudioContext {
+
+    readonly attribute AudioDestinationNode destination;
+    readonly attribute float sampleRate;
+    readonly attribute float currentTime;
+    readonly attribute AudioListener listener;
+
+    AudioBuffer createBuffer(in unsigned long numberOfChannels, in unsigned long length, in float sampleRate);
+    AudioBuffer createBuffer(in ArrayBuffer buffer, in boolean mixToMono);
+
+    void decodeAudioData(in ArrayBuffer audioData,
+                         in [Callback] AudioBufferCallback successCallback,
+                         in [Optional, Callback] AudioBufferCallback errorCallback)
+        raises(DOMException);
+
+
+    // AudioNode creation
+    AudioBufferSourceNode createBufferSource();
+    JavaScriptAudioNode createJavaScriptNode(in short bufferSize, in short numberOfInputs, in short numberOfOutputs);
+    RealtimeAnalyserNode createAnalyser();
+    AudioGainNode createGainNode();
+    DelayNode createDelayNode(in [Optional] double maxDelayTime);
+    BiquadFilterNode createBiquadFilter();
+    AudioPannerNode createPanner();
+    ConvolverNode createConvolver();
+    AudioChannelSplitter createChannelSplitter();
+    AudioChannelMerger createChannelMerger();
+    DynamicsCompressorNode createDynamicsCompressor();
+
+}
+
+interface AudioNode {
+
+    void connect(in AudioNode destination, in unsigned long output = 0, in unsigned long input = 0);
+    void disconnect(in int output = 0);
+    readonly attribute AudioContext context;
+    readonly attribute unsigned long numberOfInputs;
+    readonly attribute unsigned long numberOfOutputs;
+
+}
+
+interface AudioSourceNode : AudioNode {
+
+}
+
+interface AudioDestinationNode : AudioNode {
+
+    readonly attribute unsigned long numberOfChannels;
+
+}
+
+interface AudioParam {
+
+    attribute float value;
+    readonly attribute float minValue;
+    readonly attribute float maxValue;
+    readonly attribute float defaultValue;
+
+    readonly attribute DOMString name;
+
+    // Should define units constants here (seconds, decibels, cents, etc.)
+
+    readonly attribute short units;
+
+    // Parameter automation.
+    void setValueAtTime(in float value, in float time);
+    void linearRampToValueAtTime(in float value, in float time);
+    void exponentialRampToValueAtTime(in float value, in float time);
+
+    // Exponentially approach the target value with a rate having the given time constant.
+    void setTargetValueAtTime(in float targetValue, in float time, in float timeConstant);
+
+    // Sets an array of arbitrary parameter values starting at time for the given duration.
+    // The number of values will be scaled to fit into the desired duration.
+    void setValueCurveAtTime(in Float32Array values, in float time, in float duration);
+
+    // Cancels all scheduled parameter changes with times greater than or equal to startTime.
+    void cancelScheduledValues(in float startTime);
+
+}
+
+interface AudioGain : AudioParam {
+
+};
+
+interface AudioGainNode : AudioNode {
+
+    AudioGain gain;
+
+}
+
+interface DelayNode : AudioNode {
+
+    AudioParam delayTime;
+
+}
+
+interface AudioBuffer {
+
+    // linear gain (default 1.0)
+    attribute AudioGain gain;
+
+    readonly attribute float sampleRate;
+    readonly attribute long length;
+
+    // in seconds
+    readonly attribute float duration;
+
+    readonly attribute int numberOfChannels;
+
+    Float32Array getChannelData(in unsigned long channel);
+
+}
+
+interface AudioBufferSourceNode : AudioSourceNode {
+
+    // Playback this in-memory audio asset
+    // Many sources can share the same buffer
+    attribute AudioBuffer buffer;
+
+    readonly attribute AudioGain gain;
+    attribute AudioParam playbackRate;
+    attribute boolean loop;
+
+    void noteOn(in double when);
+    void noteGrainOn(in double when, in double grainOffset, in double grainDuration);
+    void noteOff(in double when);
+
+}
+
+interface MediaElementAudioSourceNode : AudioSourceNode {
+
+}
+
+interface JavaScriptAudioNode : AudioNode {
+
+    attribute EventListener onaudioprocess;
+
+    readonly attribute long bufferSize;
+
+}
+
+interface AudioProcessingEvent : Event {
+
+    JavaScriptAudioNode node;
+    readonly attribute float playbackTime;
+    readonly attribute AudioBuffer inputBuffer;
+    readonly attribute AudioBuffer outputBuffer;
+
+}
+
+interface AudioPannerNode : AudioNode {
+
+    // Panning model
+    const unsigned short EQUALPOWER = 0;
+    const unsigned short HRTF = 1;
+    const unsigned short SOUNDFIELD = 2;
+
+    // Distance model
+    const unsigned short LINEAR_DISTANCE = 0;
+    const unsigned short INVERSE_DISTANCE = 1;
+    const unsigned short EXPONENTIAL_DISTANCE = 2;
+
+    // Default for stereo is HRTF
+    attribute unsigned short panningModel;
+
+    // Uses a 3D cartesian coordinate system
+    void setPosition(in float x, in float y, in float z);
+    void setOrientation(in float x, in float y, in float z);
+    void setVelocity(in float x, in float y, in float z);
+
+    // Distance model and attributes
+    attribute unsigned short distanceModel;
+    attribute float refDistance;
+    attribute float maxDistance;
+    attribute float rolloffFactor;
+
+    // Directional sound cone
+    attribute float coneInnerAngle;
+    attribute float coneOuterAngle;
+    attribute float coneOuterGain;
+
+    // Dynamically calculated gain values
+    readonly attribute AudioGain coneGain;
+    readonly attribute AudioGain distanceGain;
+
+};
+
+interface AudioListener {
+
+    // linear gain (default 1.0)
+    attribute float gain;
+
+    // same as OpenAL (default 1.0)
+    attribute float dopplerFactor;
+
+    // in meters / second (default 343.3)
+    attribute float speedOfSound;
+
+    // Uses a 3D cartesian coordinate system
+    void setPosition(in float x, in float y, in float z);
+    void setOrientation(in float x, in float y, in float z, in float xUp, in float yUp, in float zUp);
+    void setVelocity(in float x, in float y, in float z);
+
+};
+
+interface ConvolverNode : AudioNode {
+
+    // Contains the (possibly multi-channel) impulse response
+    attribute AudioBuffer buffer;
+    attribute boolean normalize;
+
+    // attribute ImpulseResponse response;
+
+};
+
+interface RealtimeAnalyserNode : AudioNode {
+
+    // Real-time frequency-domain data
+    void getFloatFrequencyData(in Float32Array array);
+    void getByteFrequencyData(in Uint8Array array);
+
+    // Real-time waveform data
+    void getByteTimeDomainData(in Uint8Array array);
+
+    attribute unsigned long fftSize;
+    readonly attribute unsigned long frequencyBinCount;
+
+    attribute float minDecibels;
+    attribute float maxDecibels;
+
+    attribute float smoothingTimeConstant;
+
+};
+
+interface AudioChannelSplitter : AudioNode {
+
+};
+
+interface AudioChannelMerger : AudioNode {
+
+};
+
+interface DynamicsCompressorNode : AudioNode {
+
+    readonly attribute AudioParam threshold; // in Decibels
+    readonly attribute AudioParam knee; // in Decibels
+    readonly attribute AudioParam ratio; // unit-less
+    readonly attribute AudioParam reduction; // in Decibels
+    readonly attribute AudioParam attack; // in Seconds
+    readonly attribute AudioParam release; // in Seconds
+
+}
+
+interface BiquadFilterNode : AudioNode {
+
+    // Filter type.
+    const unsigned short LOWPASS = 0;
+    const unsigned short HIGHPASS = 1;
+    const unsigned short BANDPASS = 2;
+    const unsigned short LOWSHELF = 3;
+    const unsigned short HIGHSHELF = 4;
+    const unsigned short PEAKING = 5;
+    const unsigned short NOTCH = 6;
+    const unsigned short ALLPASS = 7;
+
+    attribute unsigned short type;
+    readonly attribute AudioParam frequency; // in Hertz
+    readonly attribute AudioParam Q; // Quality factor
+    readonly attribute AudioParam gain; // in Decibels
+
+    void getFrequencyResponse(in Float32Array frequencyHz,
+                              in Float32Array magResponse,
+                              in Float32Array phaseResponse);
+
+}
+
+interface WaveShaperNode : AudioNode {
+
+    attribute Float32Array curve;
+
+}
+
