@@ -52,7 +52,7 @@ Web Audio APIはまだ仕様確定しておらず、仕様の変更や追加・�
 現在の最新ブラウザの仕様はここに該当する。
 
 * AudioContext
-    * AudioBufferSourceNode(再生中のサンプルバッファ数モニタ)を廃止
+    * activeSourceCount属性(再生中のサンプルバッファ数モニタ)を廃止
     * createAudioBufferメソッドからArrayBufferを引数に取る形式を廃止
     * createMediaStreamDestination()を追加
     * オシレータ波形生成メソッド名がcreateWaveTableからcreatePeriodicWaveに変更
@@ -88,7 +88,7 @@ Web Audio APIはまだ仕様確定しておらず、仕様の変更や追加・�
 
 ### 20121213 vs 20120802
 
-ここはAPIの名称変更が多く、これが理由で過去のコードが動かないケースが多い。特にノード生成API名とnoteOn/noteOffからstart/stopへのメソッド名変更に注意。
+ここはAPIの名称変更が多く、これが理由で現在のブラウザで過去のコードが動かないケースが多い。特にノード生成API名とnoteOn/noteOffからstart/stopへのメソッド名変更に注意。
 
 * AudioContext
     * ノード生成API名を変更(次の2つ)
@@ -106,7 +106,7 @@ Web Audio APIはまだ仕様確定しておらず、仕様の変更や追加・�
     * panningModelとdistanceModelの値の型を整数から文字列に変更
 * BiquadFilter
     * typeの型を整数から文字列に変更
-    * (重要)API名をnoteOn, noteOffからstart, stopに変更
+    * (重要) API名をnoteOn, noteOffからstart, stopに変更
 
 ### 20120802 vs 20120315
 
