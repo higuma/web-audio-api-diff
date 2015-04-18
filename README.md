@@ -42,7 +42,11 @@ Web Audio APIはまだ仕様確定しておらず、仕様の変更や追加・�
     * 新パラメータのdetuneを追加
 * AudioWorkerNodeを追加
     * この補助用にAudioWorkerGlobalScopeとAudioProcessEventも追加
-    * 将来的にはScriptProcessorからの移行を考えているはず
+* ScriptProcessorNodeとAudioProcessingEventがDEPRECATEDになった
+    * 理由はAudioWorkerができたため
+    * ScriptProcessorはDOMと同じ空間でコード実行する
+        * そのためGUI操作中に音が途切れる現象をどうしても回避できない
+    * Workerを使えば別空間なので並列実行できる(音は途切れない)
 * StereoPannerを追加
     * 今までのPannerはゲーム向きで、通常のオーディオ用には不便だった
     * StereoPannerはステレオ定位を簡単に設定できる
