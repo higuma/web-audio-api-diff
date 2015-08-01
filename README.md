@@ -110,6 +110,7 @@ Web Audio APIはまだ仕様確定しておらず、仕様の変更や追加・�
     * panningModelとdistanceModelの値の型を整数から文字列に変更
 * BiquadFilter
     * typeの型を整数から文字列に変更
+* OscillatorNode
     * (重要) API名をnoteOn, noteOffからstart, stopに変更
 
 ### 20120802 vs 20120315
